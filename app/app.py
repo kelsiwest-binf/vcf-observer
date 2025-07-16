@@ -1,6 +1,6 @@
 import webbrowser
 from multiprocessing import freeze_support
-
+import logging
 import matplotlib
 
 from dash import html
@@ -28,4 +28,16 @@ if __name__ == '__main__':
     if config.bundled_mode:
         freeze_support()
         webbrowser.open('http://127.0.0.1:8050')
-    app.run_server(debug=config.debug_mode)
+
+    # Hide the noisy internal Docker IP logs
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.ERROR)
+
+    print("App running at: http://127.0.0.1:8050")
+
+    app.run_server(
+        debug=config.debug_mode,
+        host='0.0.0.0',
+        port=8050,
+        dev_tools_silence_routes_logging=True  # <- hides "Dash is running on..."
+    )
